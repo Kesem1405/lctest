@@ -1,0 +1,40 @@
+version: '3'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=StrongPassword1234  
+    ports:
+      - "1433:1433"
+    networks:
+      - mynetwork
+
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      - DB_HOST=sqlserver
+      - DB_USER=test
+      - DB_PASSWORD=test1234
+      - DB_NAME=mydatabase
+    ports:
+      - "8085:8085"
+    depends_on:
+      - sqlserver
+    networks:
+      - mynetwork
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
